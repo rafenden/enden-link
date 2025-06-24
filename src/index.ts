@@ -1,4 +1,5 @@
 export interface Env {
+  BASE_URL: string;
   // @ts-ignore
   ENDEN_LINK_URLS: KVNamespace;
   // @ts-ignore
@@ -10,17 +11,10 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const { pathname } = new URL(request.url);
 
-    // @ts-ignore
-    const slug = pathname.startsWith("/") ? pathname.slice(1) : pathname;
-
-    if (!slug) {
-      return Response.redirect('https://enden.com', 302);
-    }
-
-    const dest = await env.ENDEN_LINK_URLS.get(slug);
-    if (!dest) {
-      return new Response(`No URL mapped for ‘${slug}’.`, { status: 404 });
-    }
+    const slug = pathname.slice(1);
+    const dest = slug.length > 0
+      ? (await env.ENDEN_LINK_URLS.get(slug) ?? env.BASE_URL)
+      : env.BASE_URL;
 
     // @ts-ignore
     const cfProperties = request.cf;

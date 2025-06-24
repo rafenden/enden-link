@@ -14,3 +14,6 @@ preview_id = "fd2f7d1b50374ab096f46f9d4abdd20f"
 [[analytics_engine_datasets]]
 binding = "ENDEN_LINK_VIEWS"
 dataset = "enden_link_views"
+
+[vars]
+BASE_URL = "https://enden.com"
