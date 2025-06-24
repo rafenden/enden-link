@@ -12,9 +12,13 @@ export default {
     const { pathname } = new URL(request.url);
 
     const slug = pathname.slice(1);
-    const dest = slug.length > 0
-      ? (await env.ENDEN_LINK_URLS.get(slug) ?? env.BASE_URL)
-      : env.BASE_URL;
+    let dest = slug.length > 0 ? await env.ENDEN_LINK_URLS.get(slug) : null;
+
+    if (slug && !dest) {
+      return new Response('Not Found', { status: 404 });
+    }
+
+    dest = dest ?? env.BASE_URL;
 
     // @ts-ignore
     const cfProperties = request.cf;
