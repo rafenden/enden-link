@@ -33,7 +33,7 @@ export default {
     const userAgent = request.headers.get('user-agent');
     const parsedUserAgent = new UAParser(userAgent);
 
-    const trackClick = !isBot && slug && slug[0] !== '_';
+    const trackClick = !isBot(userAgent) && slug && slug[0] !== '_';
     if (trackClick) {
       const cf = request.cf;
 
@@ -50,7 +50,6 @@ export default {
             cf.city,
             cf.country,
             userAgent,
-            browser.type,
             browser.name,
             browser.version,
             device.vendor,

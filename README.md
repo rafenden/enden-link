@@ -20,6 +20,20 @@ npm i
 npm run dev
 ```
 
+## Testing
+
+The project uses Vitest for testing. To run the tests:
+
+```shell
+npm test
+```
+
+To run tests in watch mode during development:
+
+```shell
+npm run test:watch
+```
+
 ## Deployment
 
 Deployment happens with each commit to the `main` branch.

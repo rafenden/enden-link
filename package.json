@@ -7,7 +7,9 @@
     "start": "wrangler dev --remote",
     "dev": "wrangler dev --remote",
     "deploy": "wrangler deploy",
-    "build": "wrangler build"
+    "build": "wrangler build",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -19,6 +21,7 @@
     "@cloudflare/workers-types": "^4.20250620.0",
     "prettier": "^3.6.1",
     "typescript": "^5.8.3",
-    "wrangler": "^4.21.2"
+    "wrangler": "^4.21.2",
+    "vitest": "^1.3.1"
   }
 }
