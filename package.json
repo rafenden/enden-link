@@ -1,0 +1,24 @@
+{
+  "name": "enden-link",
+  "author": "Rafal Enden",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for URL shortening with analytics",
+  "scripts": {
+    "start": "wrangler dev --remote",
+    "dev": "wrangler dev --remote",
+    "deploy": "wrangler deploy",
+    "build": "wrangler build"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "ua-parser-js": "^2.0.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "prettier": "^3.6.1",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.21.2"
+  }
+}

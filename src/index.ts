@@ -1,47 +1,69 @@
+import { UAParser } from 'ua-parser-js';
+import { isBot } from 'ua-parser-js/helpers';
+
+import {
+  KVNamespace,
+  AnalyticsEngineDataset,
+  ExecutionContext,
+  Request,
+} from '@cloudflare/workers-types';
+
 export interface Env {
   BASE_URL: string;
-  // @ts-ignore
   ENDEN_LINK_URLS: KVNamespace;
-  // @ts-ignore
-  ENDEN_LINK_VIEWS: AnalyticsEngine;
+  ENDEN_LINK_VIEWS: AnalyticsEngineDataset;
 }
 
 export default {
-  // @ts-ignore
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext,
+  ): Promise<Response> {
     const { pathname } = new URL(request.url);
 
     const slug = pathname.slice(1);
     let dest = slug.length > 0 ? await env.ENDEN_LINK_URLS.get(slug) : null;
 
     if (slug && !dest) {
+      console.error(`Slug not found: ${slug}`);
       return new Response('Not Found', { status: 404 });
     }
 
-    dest = dest ?? env.BASE_URL;
+    const userAgent = request.headers.get('user-agent');
+    const parsedUserAgent = new UAParser(userAgent);
 
-    // @ts-ignore
-    const cfProperties = request.cf;
+    const trackClick = !isBot && slug && slug[0] !== '_';
+    if (trackClick) {
+      const cf = request.cf;
 
-    ctx.waitUntil(
-      env.ENDEN_LINK_VIEWS.writeDataPoint({
-        blobs: [
-          slug,
-          dest,
-          request.headers.get('user-agent'),
-          request.headers.get('referer'),
-          cfProperties.city as string,
-          cfProperties.country as string,
-          cfProperties.continent as string,
-          cfProperties.region as string,
-          cfProperties.regionCode as string,
-          cfProperties.timezone as string,
-        ],
-        doubles: [cfProperties.metroCode as number, cfProperties.longitude as number, cfProperties.latitude as number],
-        indexes: [slug],
-      })
-    );
+      const browser = parsedUserAgent.getBrowser();
+      const device = parsedUserAgent.getDevice();
+      const os = parsedUserAgent.getOS();
 
-    return Response.redirect(dest, 301);
+      ctx.waitUntil(
+        env.ENDEN_LINK_VIEWS.writeDataPoint({
+          blobs: [
+            slug,
+            dest,
+            request.headers.get('referer'),
+            cf.city,
+            cf.country,
+            userAgent,
+            browser.type,
+            browser.name,
+            browser.version,
+            device.vendor,
+            device.model,
+            os.name,
+            os.version,
+          ],
+          doubles: [],
+          indexes: [slug],
+        }),
+      );
+    }
+
+    return Response.redirect(dest ?? env.BASE_URL, 301);
   },
 };

@@ -13,7 +13,11 @@ Simple URL shortener based on Cloudflare KV and Analytics Engine.
 ## Development
 
 ```shell
-wrangler dev --remote
+npm i
+```
+
+```shell
+npm run dev
 ```
 
 ## Deployment
@@ -23,5 +27,5 @@ Deployment happens with each commit to the `main` branch.
 It's possible to deploy manually too:
 
 ```shell
-wrangler deploy
+npm run deploy
 ```
