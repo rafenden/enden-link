@@ -1,5 +1,6 @@
 import { UAParser } from 'ua-parser-js';
 import { isBot } from 'ua-parser-js/helpers';
+import yaml from 'js-yaml';
 
 import {
   KVNamespace,
@@ -23,17 +24,24 @@ export default {
     const { pathname } = new URL(request.url);
 
     const slug = pathname.slice(1);
-    let dest = slug.length > 0 ? await env.ENDEN_LINK_URLS.get(slug) : null;
 
-    if (slug && !dest) {
+    if (slug.length === 0) {
+      return Response.redirect(env.BASE_URL, 301);
+    }
+
+    const targetYaml = await env.ENDEN_LINK_URLS.get(slug);
+    if (!targetYaml) {
       console.error(`Slug not found: ${slug}`);
       return new Response('Not Found', { status: 404 });
     }
 
+    const target = yaml.load(targetYaml);
+
     const userAgent = request.headers.get('user-agent');
     const parsedUserAgent = new UAParser(userAgent);
 
-    const trackClick = !isBot(userAgent) && slug && slug[0] !== '_';
+    const trackClick =
+      !isBot(userAgent) && (target.track || target.track === undefined);
     if (trackClick) {
       const cf = request.cf;
 
@@ -45,7 +53,7 @@ export default {
         env.ENDEN_LINK_VIEWS.writeDataPoint({
           blobs: [
             slug,
-            dest,
+            target.url,
             request.headers.get('referer'),
             cf.city,
             cf.country,
@@ -63,6 +71,6 @@ export default {
       );
     }
 
-    return Response.redirect(dest ?? env.BASE_URL, 301);
+    return Response.redirect(target.url ?? env.BASE_URL, 301);
   },
 };

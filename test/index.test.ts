@@ -110,7 +110,7 @@ describe('URL Shortener Worker', () => {
 
   it('should redirect to the destination URL when a valid slug is provided', async () => {
     const destinationUrl = 'https://example.com';
-    mockKV.get.mockResolvedValueOnce(destinationUrl);
+    mockKV.get.mockResolvedValueOnce(`url: ${destinationUrl}`);
     const request = createRequestWithCf(`${BASE_URL}/example`);
 
     const response = await worker.fetch(request as any, env, ctx);
@@ -133,11 +133,9 @@ describe('URL Shortener Worker', () => {
   describe('Analytics tracking', () => {
     const destinationUrl = 'https://example.com';
 
-    beforeEach(() => {
-      mockKV.get.mockResolvedValue(destinationUrl);
-    });
-
     it('should track analytics for valid slugs with a browser', async () => {
+      mockKV.get.mockResolvedValueOnce(`url: ${destinationUrl}`);
+
       const request = createRequestWithCf(`${BASE_URL}/example`, {
         userAgent: USER_AGENTS.SAFARI,
         headers: { referer: 'https://google.com' },
@@ -166,6 +164,8 @@ describe('URL Shortener Worker', () => {
     });
 
     it('should not track analytics for bot user agents', async () => {
+      mockKV.get.mockResolvedValueOnce(`url: ${destinationUrl}`);
+
       const request = createRequestWithCf(`${BASE_URL}/example`, {
         userAgent: USER_AGENTS.BOT,
       });
@@ -175,7 +175,11 @@ describe('URL Shortener Worker', () => {
       expect(env.ENDEN_LINK_VIEWS.writeDataPoint).not.toHaveBeenCalled();
     });
 
-    it('should not track analytics for slugs starting with underscore', async () => {
+    it('should not track links for targets with tracking disabled', async () => {
+      mockKV.get.mockResolvedValueOnce(
+        `{url: ${destinationUrl}, track: false}`,
+      );
+
       const request = createRequestWithCf(`${BASE_URL}/_admin`);
 
       await worker.fetch(request as any, env, ctx);
