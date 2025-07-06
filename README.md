@@ -1,13 +1,10 @@
 # Enden Link
 
-Simple URL shortener based on Cloudflare KV and Analytics Engine.
+Simple URL shortener based on [Cloudflare KV](https://developers.cloudflare.com/kv/) and [Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/).
 
 ## Prerequisites
 
 - Cloudflare account
-- Cloudflare Workers account
-- Cloudflare Analytics Engine account
-- Cloudflare KV account
 - Wrangler installed (`brew add wrangler`)
 
 ## Development
