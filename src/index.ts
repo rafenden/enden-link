@@ -21,7 +21,7 @@ export default {
     env: Env,
     ctx: ExecutionContext,
   ): Promise<Response> {
-    const { pathname } = new URL(request.url);
+    const { pathname, search } = new URL(request.url);
 
     const slug = pathname.slice(1);
 
@@ -52,7 +52,7 @@ export default {
       ctx.waitUntil(
         env.ENDEN_LINK_VIEWS.writeDataPoint({
           blobs: [
-            slug,
+            slug + search,
             target.url,
             request.headers.get('referer'),
             cf.city,

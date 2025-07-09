@@ -136,7 +136,7 @@ describe('URL Shortener Worker', () => {
     it('should track analytics for valid slugs with a browser', async () => {
       mockKV.get.mockResolvedValueOnce(`url: ${destinationUrl}`);
 
-      const request = createRequestWithCf(`${BASE_URL}/example`, {
+      const request = createRequestWithCf(`${BASE_URL}/example?from=tests`, {
         userAgent: USER_AGENTS.SAFARI,
         headers: { referer: 'https://google.com' },
       });
@@ -145,7 +145,7 @@ describe('URL Shortener Worker', () => {
 
       expect(env.ENDEN_LINK_VIEWS.writeDataPoint).toHaveBeenCalledWith({
         blobs: [
-          'example',
+          'example?from=tests',
           destinationUrl,
           'https://google.com',
           'San Francisco',
